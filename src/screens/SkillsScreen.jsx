@@ -1,25 +1,40 @@
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, Copy, Check, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, Download } from "lucide-react";
 import { C } from "../theme";
-import { SKILLS } from "../skills";
+import { SKILLS, SKILLS_OUTRO } from "../skills";
 import Markdown from "../components/Markdown";
+
+// Dispara o download do arquivo .md da skill
+function downloadSkill(skill) {
+  try {
+    const blob = new Blob([skill.raw], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = skill.file;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch {
+    // se falhar, abre o conteúdo numa nova aba como alternativa
+    const w = window.open("", "_blank");
+    if (w) { w.document.write(`<pre>${skill.raw.replace(/</g, "&lt;")}</pre>`); }
+  }
+}
 
 export default function SkillsScreen({ isDesktop }) {
   const [selected, setSelected] = useState(null);
   const skill = SKILLS.find((s) => s.id === selected);
+
+  if (skill) return <SkillDetail skill={skill} onBack={() => setSelected(null)} isDesktop={isDesktop} />;
+
   const pad = isDesktop ? "32px" : "22px 16px";
-
-  /* ── Detalhe de uma skill ─────────────────────────────────────── */
-  if (skill) {
-    return <SkillDetail skill={skill} onBack={() => setSelected(null)} isDesktop={isDesktop} />;
-  }
-
-  /* ── Lista de skills ──────────────────────────────────────────── */
   return (
     <div style={{ padding: pad, maxWidth: 880, margin: "0 auto" }}>
       <span style={{ fontWeight: 700, fontSize: 20, color: C.text, display: "block", marginBottom: 8 }}>Skills</span>
       <p style={{ fontSize: 13.5, color: C.muted, lineHeight: 1.55, marginTop: 0, marginBottom: 18 }}>
-        Suas skills de criação de conteúdo. Siga a ordem: <b style={{ color: C.text }}>1) Persona → 2) Linha Editorial → 3) Modela Conteúdo</b>. As duas primeiras criam a base; a terceira você usa toda semana.
+        Suas skills de criação de conteúdo. Siga a ordem: <b style={{ color: C.text }}>1) Persona → 2) Linha Editorial → 3) Modela Conteúdo</b>. Toque em cada uma para ver os detalhes e baixar o arquivo.
       </p>
 
       <div style={isDesktop ? { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 } : undefined}>
@@ -29,7 +44,7 @@ export default function SkillsScreen({ isDesktop }) {
             <button key={s.id} onClick={() => setSelected(s.id)} style={{
               width: "100%", textAlign: "left", background: C.card, border: `1px solid ${C.border}`,
               borderRadius: 16, padding: "16px", cursor: "pointer", boxShadow: C.sh, marginBottom: isDesktop ? 0 : 12,
-              display: "flex", gap: 13, alignItems: "flex-start",
+              display: "flex", gap: 13, alignItems: "center",
             }}>
               <div style={{ width: 44, height: 44, borderRadius: 12, background: C.dark, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, position: "relative" }}>
                 <Icon size={20} color={C.gold} />
@@ -37,53 +52,36 @@ export default function SkillsScreen({ isDesktop }) {
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontWeight: 600, fontSize: 15, color: C.text, marginBottom: 2 }}>{s.title}</div>
-                <div style={{ fontSize: 12.5, color: C.muted, marginBottom: 8 }}>{s.subtitle}</div>
-                <div style={{ fontSize: 12.5, color: C.text, lineHeight: 1.5, opacity: 0.85 }}>{s.when}</div>
+                <div style={{ fontSize: 12.5, color: C.muted }}>{s.subtitle}</div>
               </div>
-              <ChevronRight size={18} color={C.muted} style={{ flexShrink: 0, marginTop: 4 }} />
+              <ChevronRight size={18} color={C.muted} style={{ flexShrink: 0 }} />
             </button>
           );
         })}
+      </div>
+
+      {/* Como as três funcionam juntas */}
+      <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, padding: "4px 18px 6px", boxShadow: C.sh, marginTop: 18 }}>
+        <Markdown text={SKILLS_OUTRO} />
       </div>
     </div>
   );
 }
 
-/* ── Detalhe + Markdown + Copiar ────────────────────────────────── */
 function SkillDetail({ skill, onBack, isDesktop }) {
-  const [copied, setCopied] = useState(false);
   const Icon = skill.icon;
-
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(skill.raw);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // fallback simples
-      const ta = document.createElement("textarea");
-      ta.value = skill.raw;
-      document.body.appendChild(ta);
-      ta.select();
-      try { document.execCommand("copy"); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch {}
-      document.body.removeChild(ta);
-    }
-  };
-
   return (
     <div style={{ padding: isDesktop ? "24px 32px 40px" : "18px 16px 32px", maxWidth: 820, margin: "0 auto" }}>
-      {/* Topo: voltar + copiar */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
         <button onClick={onBack} style={{ display: "flex", alignItems: "center", gap: 4, background: "none", border: "none", cursor: "pointer", color: C.muted, fontSize: 14, padding: 0 }}>
           <ChevronLeft size={18} /> Voltar
         </button>
-        <button onClick={copy} style={{ display: "flex", alignItems: "center", gap: 7, background: copied ? "#D8EDE0" : C.dark, border: "none", borderRadius: 12, padding: "9px 14px", cursor: "pointer", color: copied ? "#1E5C38" : "#FBF6EC", fontWeight: 600, fontSize: 13 }}>
-          {copied ? <Check size={15} /> : <Copy size={15} />} {copied ? "Copiado!" : "Copiar skill"}
+        <button onClick={() => downloadSkill(skill)} style={{ display: "flex", alignItems: "center", gap: 7, background: C.dark, border: "none", borderRadius: 12, padding: "9px 14px", cursor: "pointer", color: "#FBF6EC", fontWeight: 600, fontSize: 13 }}>
+          <Download size={15} /> Baixar skill (.md)
         </button>
       </div>
 
-      {/* Cabeçalho da skill */}
-      <div style={{ display: "flex", gap: 13, alignItems: "center", marginBottom: 16 }}>
+      <div style={{ display: "flex", gap: 13, alignItems: "center", marginBottom: 18 }}>
         <div style={{ width: 48, height: 48, borderRadius: 13, background: C.dark, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
           <Icon size={22} color={C.gold} />
         </div>
@@ -93,19 +91,15 @@ function SkillDetail({ skill, onBack, isDesktop }) {
         </div>
       </div>
 
-      {/* Orientação "Quando usar" */}
-      <div style={{ background: "#FFF3D8", borderRadius: 14, padding: "14px 16px", marginBottom: 22, display: "flex", gap: 10 }}>
-        <Sparkles size={17} color={C.gold} style={{ flexShrink: 0, marginTop: 2 }} />
-        <div>
-          <div style={{ fontSize: 12, fontWeight: 700, color: "#8B6000", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.03em" }}>Quando usar</div>
-          <div style={{ fontSize: 13.5, color: "#6B4D00", lineHeight: 1.55 }}>{skill.when}</div>
-        </div>
+      {/* Descrição da skill */}
+      <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, padding: isDesktop ? "20px 28px" : "16px 18px", boxShadow: C.sh, marginBottom: 18 }}>
+        <Markdown text={skill.description} />
       </div>
 
-      {/* Conteúdo da skill em Markdown */}
-      <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, padding: isDesktop ? "24px 28px" : "18px 18px", boxShadow: C.sh }}>
-        <Markdown text={skill.body} />
-      </div>
+      {/* Baixar (rodapé também, fácil de achar) */}
+      <button onClick={() => downloadSkill(skill)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: C.gold, border: "none", borderRadius: 14, padding: "14px", cursor: "pointer", color: C.dark, fontWeight: 700, fontSize: 15 }}>
+        <Download size={17} /> Baixar “{skill.title}” (.md)
+      </button>
     </div>
   );
 }

@@ -17,8 +17,18 @@ create table if not exists public.content_items (
   time_slot   integer,
   steps       integer default 0,
   total       integer default 5,
-  created_at  timestamptz default now()
+  link           text,
+  images         jsonb default '[]'::jsonb,
+  audio          text,
+  scheduled_date date,
+  created_at     timestamptz default now()
 );
+
+-- Se a tabela já existia de uma versão anterior, garante as colunas novas:
+alter table public.content_items add column if not exists link           text;
+alter table public.content_items add column if not exists images         jsonb default '[]'::jsonb;
+alter table public.content_items add column if not exists audio          text;
+alter table public.content_items add column if not exists scheduled_date date;
 
 -- Índice para carregar rápido os conteúdos de cada usuária
 create index if not exists content_items_user_id_idx

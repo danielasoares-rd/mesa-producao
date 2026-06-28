@@ -1,7 +1,9 @@
+import { Mic, Image as ImageIcon, Link2 } from "lucide-react";
 import { C, PL } from "../theme";
 import { PlatBadge, StatusPill, Thumb } from "./ui";
 
 export default function ContentCard({ item, onClick }) {
+  const hasImages = Array.isArray(item.images) && item.images.length > 0;
   return (
     <div onClick={() => onClick(item)} style={{
       background: C.card, borderRadius: 16, padding: "12px 14px",
@@ -18,7 +20,12 @@ export default function ContentCard({ item, onClick }) {
         <div style={{ fontWeight: 600, fontSize: 13.5, lineHeight: 1.3, marginBottom: 7, color: C.text }}>{item.title}</div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <StatusPill status={item.status} />
-          <span style={{ fontSize: 12, color: C.muted }}>{item.date}</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+            {item.audio && <Mic size={13} color={C.muted} />}
+            {hasImages && <ImageIcon size={13} color={C.muted} />}
+            {item.link && <Link2 size={13} color={C.muted} />}
+            <span style={{ fontSize: 12, color: C.muted }}>{item.date}</span>
+          </div>
         </div>
       </div>
     </div>

@@ -1,8 +1,15 @@
-import { Calendar, BarChart2, FileText, Check, Trash2, X } from "lucide-react";
+import { Calendar, BarChart2, FileText, Check, Trash2, X, Link2, Pencil } from "lucide-react";
 import { C, PL } from "../theme";
 import { PlatBadge, StatusPill } from "./ui";
 
-export default function DetailPanel({ item, onClose, onDelete }) {
+// Garante que o link abra como URL absoluta (adiciona https:// se faltar)
+function safeHref(link) {
+  const v = (link || "").trim();
+  if (!v) return null;
+  return /^https?:\/\//i.test(v) ? v : `https://${v}`;
+}
+
+export default function DetailPanel({ item, onClose, onDelete, onEdit }) {
   if (!item) return null;
   const pct = Math.round((item.steps / item.total) * 100);
   return (
@@ -42,12 +49,43 @@ export default function DetailPanel({ item, onClose, onDelete }) {
           <div style={{ height: "100%", borderRadius: 4, background: C.accent, width: `${pct}%`, transition: "width 0.4s" }} />
         </div>
       </div>
+      {/* Anexos: link, imagens e áudio */}
+      {(() => {
+        const href = safeHref(item.link);
+        const images = Array.isArray(item.images) ? item.images : [];
+        const hasMedia = href || images.length > 0 || item.audio;
+        if (!hasMedia) return null;
+        return (
+          <div style={{ paddingBottom: 14, marginBottom: 2 }}>
+            {href && (
+              <a href={href} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 8, color: C.accent, fontSize: 13, textDecoration: "none", padding: "9px 0", borderBottom: `0.5px solid ${C.border}`, wordBreak: "break-all" }}>
+                <Link2 size={14} style={{ flexShrink: 0 }} /> {item.link}
+              </a>
+            )}
+            {images.length > 0 && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, padding: "12px 0" }}>
+                {images.map((src, i) => (
+                  <a key={i} href={src} target="_blank" rel="noopener noreferrer">
+                    <img src={src} alt="" style={{ width: 72, height: 72, objectFit: "cover", borderRadius: 10, border: `1px solid ${C.border}`, display: "block" }} />
+                  </a>
+                ))}
+              </div>
+            )}
+            {item.audio && (
+              <div style={{ paddingTop: images.length ? 0 : 10 }}>
+                <audio src={item.audio} controls style={{ width: "100%", height: 38 }} />
+              </div>
+            )}
+          </div>
+        );
+      })()}
+
       <div style={{ display: "flex", gap: 10 }}>
         <button onClick={() => onDelete(item.id)} style={{ flex: 1, background: "rgba(43,22,13,0.06)", border: "none", borderRadius: 12, padding: "12px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: C.muted, fontSize: 13 }}>
           <Trash2 size={14} /> Excluir
         </button>
-        <button style={{ flex: 2, background: C.dark, border: "none", borderRadius: 12, padding: "12px", cursor: "pointer", color: "#FBF6EC", fontWeight: 600, fontSize: 14 }}>
-          Ver detalhes completos
+        <button onClick={() => onEdit?.(item)} style={{ flex: 2, background: C.dark, border: "none", borderRadius: 12, padding: "12px", cursor: "pointer", color: "#FBF6EC", fontWeight: 600, fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", gap: 7 }}>
+          <Pencil size={15} /> Editar conteúdo
         </button>
       </div>
     </div>

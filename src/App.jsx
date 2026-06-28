@@ -37,33 +37,40 @@ export default function App() {
 
 function Dashboard({ user, name, signOut }) {
   const isDesktop = useIsDesktop();
-  const { items, loading, addItem, delItem, loadSamples } = useItems(user.id);
+  const { items, loading, addItem, updateItem, delItem, loadSamples } = useItems(user.id);
 
   const [screen, setScreen] = useState("home");
   const [detail, setDetail] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
+  const [editItem, setEditItem] = useState(null); // item sendo editado (null = novo)
 
-  const handleAdd = async (item) => {
-    await addItem(item);
-    setShowAdd(false);
+  const openNew = () => { setEditItem(null); setShowAdd(true); };
+  const openEdit = (item) => { setDetail(null); setEditItem(item); setShowAdd(true); };
+  const closeModal = () => { setShowAdd(false); setEditItem(null); };
+
+  const handleSave = async (item) => {
+    const error = editItem ? await updateItem(editItem.id, item) : await addItem(item);
+    if (!error) closeModal(); // só fecha se salvou de verdade
+    return error;
   };
   const handleDelete = async (id) => {
     await delItem(id);
     setDetail(null);
   };
 
-  const screenProps = { items, setDetail, setScreen, setShowAdd, name, signOut, isDesktop };
+  // setShowAdd é passado aos filhos como "abrir novo conteúdo"
+  const screenProps = { items, setDetail, setScreen, setShowAdd: openNew, name, signOut, isDesktop };
 
   const screens = (
     <>
       {screen === "home" && <HomeScreen {...screenProps} loadSamples={items.length === 0 ? loadSamples : null} />}
-      {screen === "content" && <ContentScreen items={items} setDetail={setDetail} setShowAdd={setShowAdd} isDesktop={isDesktop} />}
-      {screen === "calendar" && <CalendarScreen items={items} detail={detail} setDetail={setDetail} setShowAdd={setShowAdd} onDelete={handleDelete} isDesktop={isDesktop} />}
+      {screen === "content" && <ContentScreen items={items} setDetail={setDetail} setShowAdd={openNew} isDesktop={isDesktop} />}
+      {screen === "calendar" && <CalendarScreen items={items} detail={detail} setDetail={setDetail} setShowAdd={openNew} onDelete={handleDelete} onEdit={openEdit} isDesktop={isDesktop} />}
       {screen === "analytics" && <AnalyticsScreen items={items} isDesktop={isDesktop} />}
 
       {detail && screen !== "calendar" && (
         <div style={{ padding: "0 16px", maxWidth: 880, margin: "0 auto" }}>
-          <DetailPanel item={detail} onClose={() => setDetail(null)} onDelete={handleDelete} />
+          <DetailPanel item={detail} onClose={() => setDetail(null)} onDelete={handleDelete} onEdit={openEdit} />
         </div>
       )}
     </>
@@ -76,7 +83,7 @@ function Dashboard({ user, name, signOut }) {
         <Sidebar screen={screen} setScreen={setScreen} setShowAdd={setShowAdd} />
         <main style={{ flex: 1, minWidth: 0, position: "relative" }}>
           {loading ? <Loader text="Carregando seus conteúdos…" /> : screens}
-          {showAdd && <AddModal onClose={() => setShowAdd(false)} onSave={handleAdd} />}
+          {showAdd && <AddModal onClose={closeModal} onSave={handleSave} initial={editItem} />}
         </main>
       </div>
     );
@@ -97,7 +104,7 @@ function Dashboard({ user, name, signOut }) {
 
       {showAdd && (
         <div style={{ position: "absolute", inset: 0, zIndex: 200 }}>
-          <AddModal onClose={() => setShowAdd(false)} onSave={handleAdd} />
+          <AddModal onClose={closeModal} onSave={handleSave} initial={editItem} />
         </div>
       )}
     </div>

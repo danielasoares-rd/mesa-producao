@@ -2,6 +2,11 @@
   command = "npm run build"
   publish = "dist"
 
+# Faz o botão "Deploy to Netlify" pedir as chaves do Supabase na hora da publicação
+[template.environment]
+  VITE_SUPABASE_URL = "Cole a Project URL do seu Supabase (Project Settings > API)"
+  VITE_SUPABASE_ANON_KEY = "Cole a chave 'anon/publishable' do seu Supabase"
+
 # Redireciona todas as rotas para o index.html (necessário para apps React de página única)
 [[redirects]]
   from = "/*"

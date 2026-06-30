@@ -10,6 +10,22 @@ App de organização de produção de conteúdo para nutricionistas. Funciona no
 
 ---
 
+## 🚀 Publicar em 1 clique (caminho rápido para a nutri)
+
+Quer colocar o seu app no ar sem mexer em código? Siga 3 passos:
+
+**1) Crie seu banco no Supabase** (grátis) e rode o SQL — veja a [Parte 1](#parte-1--criar-o-banco-no-supabase) abaixo. Anote a **Project URL** e a chave **anon/publishable**.
+
+**2) Clique no botão abaixo** para publicar sua cópia no Netlify:
+
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/danielasoares-rd/mesa-producao)
+
+**3) Cole as 2 chaves** quando o Netlify pedir (`VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`) e confirme. Em ~1 minuto seu app está no ar com um link próprio. 🎉
+
+> O botão cria uma cópia do projeto no **seu** GitHub e publica no **seu** Netlify. Seus dados ficam no **seu** Supabase. Cada nutri tem o app totalmente separado.
+
+---
+
 ## 🧭 Visão geral (como funciona)
 
 O app usa dois serviços **gratuitos**:

@@ -12,6 +12,12 @@ const blank = {
   scheduledDate: todayStr(), timeSlot: 0, link: "", images: [], audio: null,
 };
 
+// Traduz erros técnicos do banco para uma instrução clara
+const niceError = (m) =>
+  /column|schema cache|does not exist|relation/i.test(m || "")
+    ? "Falta atualizar o banco: rode o SQL de atualização no Supabase (SQL Editor → Run)."
+    : (m || "tente novamente.");
+
 export default function AddModal({ onClose, onSave, initial, prefill }) {
   const isEdit = !!initial;
   const [form, setForm] = useState(() => initial ? {
@@ -116,11 +122,11 @@ export default function AddModal({ onClose, onSave, initial, prefill }) {
       const error = await onSave(payload);
       if (error) {
         setSaving(false);
-        setMediaMsg("Não foi possível salvar: " + (error.message || "tente novamente."));
+        setMediaMsg("Não foi possível salvar: " + niceError(error.message));
       }
     } catch (e) {
       setSaving(false);
-      setMediaMsg("Não foi possível salvar: " + (e?.message || "tente novamente."));
+      setMediaMsg("Não foi possível salvar: " + niceError(e?.message));
     }
   };
 

@@ -62,6 +62,13 @@ function Dashboard({ user, name, signOut }) {
 
   const openContentFiltered = (filter) => { setContentFilter(filter); setScreen("content"); };
 
+  // "+" do calendário: novo conteúdo já com a data escolhida
+  const openNewOnDate = (dateStr) => {
+    setEditItem(null); setFromIdea(null);
+    setPrefill({ scheduledDate: dateStr });
+    setShowAdd(true);
+  };
+
   // Ideia → conteúdo: abre o modal já com o título preenchido
   const onTransformIdea = (idea) => {
     setEditItem(null);
@@ -120,7 +127,7 @@ function Dashboard({ user, name, signOut }) {
           isDesktop={isDesktop} initialFilter={contentFilter}
         />
       )}
-      {screen === "calendar" && <CalendarScreen items={items} detail={detail} setDetail={setDetail} setShowAdd={openNew} onDelete={handleDelete} onEdit={openEdit} onOpen={openEditor} isDesktop={isDesktop} />}
+      {screen === "calendar" && <CalendarScreen items={items} detail={detail} setDetail={setDetail} setShowAdd={openNew} onAddOnDate={openNewOnDate} onDelete={handleDelete} onEdit={openEdit} onOpen={openEditor} isDesktop={isDesktop} />}
       {screen === "analytics" && <AnalyticsScreen items={items} isDesktop={isDesktop} />}
       {screen === "skills" && <SkillsScreen isDesktop={isDesktop} />}
 

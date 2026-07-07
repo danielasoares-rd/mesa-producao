@@ -1,9 +1,10 @@
-import { Users, BookOpen, Wand2 } from "lucide-react";
+import { Users, BookOpen, Wand2, CalendarDays } from "lucide-react";
 
 // Conteúdo bruto dos arquivos .md das skills (Vite: ?raw vira string) — usado no download
 import personaRaw from "./skills/persona-nutri-builder.md?raw";
 import linhaRaw from "./skills/linha-editorial-nutri.md?raw";
 import modelaRaw from "./skills/modela-conteudo-nutri.md?raw";
+import planejamentoRaw from "./skills/planejamento-mensal-conteudo.md?raw";
 
 // Descrições (texto que a nutri lê) — escritas pela Daniela.
 const personaDesc = `
@@ -79,10 +80,32 @@ Junto com o conteúdo, ela entrega uma nota curta explicando o que foi preservad
 - **Série:** uma referência vira 3 formatos diferentes — carrossel, reels e legenda
 `.trim();
 
+const planejamentoDesc = `
+## Para que serve
+Para parar de improvisar o conteúdo do mês e começar a criar com estratégia. Sem planejamento, você posta o que vem à cabeça, não sabe se está construindo audiência ou autoridade, e chega no final do mês sem ter gerado resultado nenhum. Essa skill resolve isso.
+
+## Como funciona
+Você ativa a skill e ela conduz um diagnóstico completo: qual é o seu objetivo do mês, se tem lançamento ou evento especial, quem é a sua cliente ideal e o que já funcionou antes. Com base nas respostas, ela calcula a proporção certa de cada tipo de conteúdo, monta o calendário semana a semana e entrega todos os ganchos e copys prontos para criar.
+
+São 5 fases em ordem. Nenhuma é pulada.
+
+## O que ela gera
+Um plano de conteúdo completo com:
+
+- Análise estratégica do mês — objetivo, tensões e oportunidades identificadas
+- Proporção de cada tipo de conteúdo com o raciocínio por trás
+- Calendário editorial semana a semana com tema e dia de cada post
+- Formato definido para cada post — Reels ou Carrossel — com justificativa
+- Ganchos prontos adaptados ao seu nicho e à sua persona
+- Copy completo de cada post: roteiro de Reels com marcação de tempo ou slides de Carrossel numerados, legenda e CTA
+
+Você instala essa skill no seu projeto Claude e, toda vez que for planejar um novo mês, é só ativar. Ela já sabe com quem você está falando — e entrega o plano pronto para executar.
+`.trim();
+
 // Nota geral, exibida no fim da lista.
 export const SKILLS_OUTRO = `
-## Como as três funcionam juntas
-**Persona** define com quem você fala. **Linha editorial** define sobre o que você fala. **Modelagem** define como você transforma qualquer referência em conteúdo original que serve a quem você fala e se encaixa no que você decidiu falar.
+## Como as quatro funcionam juntas
+**Persona** define com quem você fala. **Linha editorial** define sobre o que você fala. **Planejamento mensal** transforma isso no seu calendário do mês, com ganchos e copys prontos. **Modelagem** define como você transforma qualquer referência em conteúdo original que serve a quem você fala e se encaixa no que você decidiu falar.
 
 Quanto mais skills você tiver instaladas no seu projeto, menos você precisa explicar ao Claude — e mais rápido sai o conteúdo pronto.
 `.trim();
@@ -109,9 +132,19 @@ export const SKILLS = [
     raw: linhaRaw,
   },
   {
+    id: "planejamento-mensal",
+    icon: CalendarDays,
+    step: 3,
+    title: "Planejamento Mensal de Conteúdo",
+    subtitle: "Planeje o mês inteiro com estratégia",
+    description: planejamentoDesc,
+    file: "planejamento-mensal-conteudo.md",
+    raw: planejamentoRaw,
+  },
+  {
     id: "modela-conteudo",
     icon: Wand2,
-    step: 3,
+    step: 4,
     title: "Modela Conteúdo Nutri",
     subtitle: "Transforme referências em conteúdo seu",
     description: modelaDesc,

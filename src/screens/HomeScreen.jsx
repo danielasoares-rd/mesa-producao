@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, FileText, Play, Send, CheckCircle2, Lightbulb, Calendar, Sparkles, LogOut, Star, Trash2, ArrowRight } from "lucide-react";
+import { Plus, FileText, Play, Send, CheckCircle2, Lightbulb, Calendar, Sparkles, LogOut, Star, Trash2, ArrowRight, HelpCircle } from "lucide-react";
 import { C, ST } from "../theme";
 import ContentCard from "../components/ContentCard";
 import Avatar from "../components/Avatar";
@@ -41,11 +41,16 @@ export default function HomeScreen({
             <div style={{ fontSize: 12.5, color: C.muted }}>Pronta para criar hoje?</div>
           </div>
         </div>
-        {!isDesktop && (
-          <button onClick={signOut} title="Sair" className="press" style={{ background: "none", border: "none", cursor: "pointer", padding: 8 }}>
-            <LogOut size={20} color={C.muted} />
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <button onClick={() => setScreen("help")} title="Como usar o app" className="press" style={{ background: "none", border: "none", cursor: "pointer", padding: 8 }}>
+            <HelpCircle size={20} color={C.muted} />
           </button>
-        )}
+          {!isDesktop && (
+            <button onClick={signOut} title="Sair" className="press" style={{ background: "none", border: "none", cursor: "pointer", padding: 8 }}>
+              <LogOut size={20} color={C.muted} />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Visão geral */}

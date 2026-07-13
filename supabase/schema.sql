@@ -33,6 +33,7 @@ alter table public.content_items add column if not exists audio          text;
 alter table public.content_items add column if not exists scheduled_date date;
 alter table public.content_items add column if not exists document       jsonb default '[]'::jsonb;
 alter table public.content_items add column if not exists stages         jsonb default '[false,false,false,false,false]'::jsonb;
+alter table public.content_items add column if not exists metrics        jsonb default '{}'::jsonb;
 
 -- ============================================================
 -- Perfil da nutri (foto)

@@ -1,4 +1,4 @@
-import { Home, LayoutGrid, Calendar, BarChart2, Plus, Wand2, Images, LogOut } from "lucide-react";
+import { Home, LayoutGrid, Calendar, BarChart2, Plus, Wand2, Images, LogOut, HelpCircle } from "lucide-react";
 import { C } from "../theme";
 import { useAuth } from "../lib/useAuth";
 import Avatar from "./Avatar";
@@ -52,8 +52,11 @@ export default function Sidebar({ screen, setScreen, setShowAdd, avatar, onUploa
         })}
       </nav>
 
-      {/* Sair */}
-      <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 14 }}>
+      {/* Ajuda + Sair */}
+      <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 10 }}>
+        <button onClick={() => setScreen("help")} className="press" style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", background: screen === "help" ? "rgba(165,106,46,0.12)" : "none", border: "none", cursor: "pointer", padding: "9px 8px", color: screen === "help" ? C.accent : C.muted, fontSize: 13.5, fontWeight: 600, borderRadius: 10 }}>
+          <HelpCircle size={17} /> Como usar o app
+        </button>
         <button onClick={signOut} className="press" style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", background: "none", border: "none", cursor: "pointer", padding: "9px 8px", color: C.muted, fontSize: 13.5, fontWeight: 500, borderRadius: 10 }}>
           <LogOut size={17} /> Sair da conta
         </button>

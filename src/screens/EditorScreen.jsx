@@ -47,6 +47,28 @@ function FormatToolbar() {
   );
 }
 
+/* Textarea que cresce com o conteúdo — mede DEPOIS do layout (evita altura errada no carregamento) */
+function AutoTextarea({ value, onChange, className, style, placeholder }) {
+  const ref = useRef(null);
+  const measure = () => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + "px";
+  };
+  useEffect(measure, [value]);
+  useEffect(() => {
+    // re-mede quando a fonte serifada termina de carregar
+    if (document.fonts?.ready) document.fonts.ready.then(measure);
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+  return (
+    <textarea ref={ref} rows={1} className={className} style={{ overflow: "hidden", ...style }}
+      value={value} placeholder={placeholder} onChange={onChange} />
+  );
+}
+
 /* Bloco de texto rico (contentEditable, não controlado — preserva o cursor) */
 function RichBlock({ block, onInput }) {
   return (
@@ -128,12 +150,6 @@ export default function EditorScreen({ item, onSave, onBack, onDelete, isDesktop
     if (imgs.length) setBlocks([...blocks, ...imgs]);
   };
 
-  const autoGrow = (el) => {
-    if (!el) return;
-    el.style.height = "auto";
-    el.style.height = el.scrollHeight + "px";
-  };
-
   const pad = isDesktop ? "28px 40px 80px" : "16px 16px 60px";
   const maxW = 720;
 
@@ -173,20 +189,39 @@ export default function EditorScreen({ item, onSave, onBack, onDelete, isDesktop
       </div>
 
       {/* Título */}
-      <textarea
+      <AutoTextarea
         className="editor-title"
         style={{ fontSize: isDesktop ? 34 : 26, marginBottom: 18 }}
-        rows={1}
-        ref={autoGrow}
-        onInput={(e) => autoGrow(e.target)}
         value={draft.title}
         placeholder="Título do conteúdo"
         onChange={(e) => upd({ title: e.target.value })}
       />
 
       {/* Etapas */}
-      <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, padding: "16px 18px", boxShadow: C.sh, marginBottom: 22 }}>
+      <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, padding: "16px 18px", boxShadow: C.sh, marginBottom: 14 }}>
         <StageChecklist stages={draft.stages} onChange={onStages} />
+      </div>
+
+      {/* Métricas do post (preenchidas pela nutri após postar) */}
+      <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, padding: "14px 18px 16px", boxShadow: C.sh, marginBottom: 22 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+          <span style={{ fontSize: 12.5, color: C.muted, fontWeight: 600 }}>Métricas do post</span>
+          <span style={{ fontSize: 11, color: C.muted }}>alimenta a aba Análises</span>
+        </div>
+        <p style={{ fontSize: 11.5, color: C.muted, margin: "0 0 10px" }}>Depois de postar, copie os números do Instagram e preencha aqui.</p>
+        <div style={{ display: "grid", gridTemplateColumns: isDesktop ? "repeat(4,1fr)" : "1fr 1fr", gap: 10 }}>
+          {[["views", "Views"], ["saves", "Saves"], ["follows", "Follows"], ["dms", "DMs"]].map(([k, label]) => (
+            <div key={k}>
+              <label style={{ fontSize: 11, color: C.muted, display: "block", marginBottom: 4, fontWeight: 600 }}>{label}</label>
+              <input
+                type="number" min="0" inputMode="numeric" placeholder="0"
+                value={draft.metrics?.[k] ?? ""}
+                onChange={(e) => upd({ metrics: { ...(draft.metrics || {}), [k]: e.target.value === "" ? "" : Math.max(0, Number(e.target.value)) } })}
+                style={{ width: "100%", background: "rgba(43,22,13,0.05)", border: `1px solid ${C.border}`, borderRadius: 10, padding: "9px 11px", fontSize: 14, color: C.text, fontFamily: "inherit", boxSizing: "border-box", outline: "none" }}
+              />
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Anexos herdados (link / áudio da ideia) */}

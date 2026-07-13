@@ -41,8 +41,15 @@ export default function AnalyticsScreen({ items, isDesktop }) {
         </div>
       </div>
       <p style={{ fontSize: 12.5, color: C.muted, margin: "0 0 18px" }}>
-        {usingDemo ? "Mostrando dados de exemplo — poste conteúdos para ver os seus." : "Métricas dos conteúdos postados (dados simulados por enquanto)."}
+        {usingDemo ? "Mostrando dados de exemplo — poste conteúdos para ver os seus." : "Métricas que você preenche em cada conteúdo postado (na página do conteúdo)."}
       </p>
+
+      {/* Há postados, mas sem métricas preenchidas */}
+      {posted.length > 0 && m.filled === 0 && (
+        <div className="anim-fade-up" style={{ background: "#FFF3D8", color: "#6B4D00", borderRadius: 12, padding: "12px 14px", fontSize: 13, lineHeight: 1.55, marginBottom: 16 }}>
+          💡 Você tem {posted.length} conteúdo{posted.length > 1 ? "s" : ""} postado{posted.length > 1 ? "s" : ""}, mas sem métricas ainda. Abra o conteúdo (botão <b>Abrir conteúdo</b>) e preencha <b>Views, Saves, Follows e DMs</b> no card "Métricas do post" — os números aparecem aqui na hora.
+        </div>
+      )}
 
       {/* Estado vazio: nada postado ainda */}
       {source.length === 0 ? (

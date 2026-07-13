@@ -22,6 +22,7 @@ import ContentScreen from "./screens/ContentScreen";
 import AnalyticsScreen from "./screens/AnalyticsScreen";
 import SkillsScreen from "./screens/SkillsScreen";
 import GalleryScreen from "./screens/GalleryScreen";
+import TutorialScreen from "./screens/TutorialScreen";
 import EditorScreen from "./screens/EditorScreen";
 
 function Loader({ text }) {
@@ -154,6 +155,7 @@ function Dashboard({ user, name, signOut }) {
       {screen === "analytics" && <AnalyticsScreen items={items} isDesktop={isDesktop} />}
       {screen === "skills" && <SkillsScreen isDesktop={isDesktop} />}
       {screen === "gallery" && <GalleryScreen {...gallery} isDesktop={isDesktop} />}
+      {screen === "help" && <TutorialScreen isDesktop={isDesktop} />}
 
       {detail && screen !== "calendar" && (
         <div style={{ padding: "0 16px", maxWidth: 880, margin: "0 auto" }}>

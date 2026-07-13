@@ -26,6 +26,7 @@ const fromRow = (r) => {
     audio: r.audio || null,
     document: Array.isArray(r.document) ? r.document : [],
     stages,
+    metrics: r.metrics && typeof r.metrics === "object" ? r.metrics : {},
   };
 };
 
@@ -50,6 +51,7 @@ const toRow = (item, userId) => {
     audio: item.audio || null,
     document: Array.isArray(item.document) ? item.document : [],
     stages: Array.isArray(item.stages) && item.stages.length === 5 ? item.stages : [false, false, false, false, false],
+    metrics: item.metrics && typeof item.metrics === "object" ? item.metrics : {},
   };
 };
 

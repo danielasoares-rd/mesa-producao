@@ -23,16 +23,31 @@ function rng(seedStr) {
 const DAY = 24 * 60 * 60 * 1000;
 const daysAgo = (n) => new Date(Date.now() - n * DAY);
 
-/* ── Métricas totais de UM conteúdo (mock estável por id) ──────── */
+/* ── Métricas totais de UM conteúdo ─────────────────────────────
+   Conteúdos reais: usa o que a nutri preencheu na página do conteúdo.
+   Conteúdos de exemplo (id "demo-"): números simulados estáveis.  */
 export function itemMetrics(item) {
+  const isDemo = String(item.id).startsWith("demo-");
   const r = rng(item.id);
+
+  if (!isDemo) {
+    const m = item.metrics || {};
+    return {
+      views: Number(m.views) || 0,
+      saves: Number(m.saves) || 0,
+      follows: Number(m.follows) || 0,
+      dms: Number(m.dms) || 0,
+      postDate: item.scheduledDate ? parseYmd(item.scheduledDate) : daysAgo(1),
+      real: true,
+    };
+  }
+
   const views = Math.round(600 + r() * r() * 28000);       // 600–28K, maioria baixa
   const saves = Math.round(views * (0.015 + r() * 0.085)); // 1,5%–10%
   const follows = Math.round(views * (0.003 + r() * 0.02));
   const dms = Math.round(views * (0.001 + r() * 0.014));
-  // dia do post: usa a data agendada; sem data → um dia estável nos últimos 28
-  const postDate = item.scheduledDate ? parseYmd(item.scheduledDate) : daysAgo(Math.floor(r() * 28) + 1);
-  return { views, saves, follows, dms, postDate };
+  const postDate = daysAgo(Math.floor(r() * 28) + 1);
+  return { views, saves, follows, dms, postDate, real: false };
 }
 
 /* ── Série diária agregada (para os sparklines) ────────────────── */
@@ -44,7 +59,12 @@ function buildSeries(metricsList, periodDays, offsetDays = 0) {
     for (const it of metricsList) {
       const age = Math.floor((day - it.postDate) / DAY); // dias desde o post
       if (age < 0) continue;
-      // pico no dia do post com decaimento exponencial (~1 semana de vida útil)
+      if (it.real) {
+        // dados reais: o valor inteiro entra no dia do post (sem simulação)
+        if (age === 0) { v += it.views; s += it.saves; f += it.follows; m += it.dms; }
+        continue;
+      }
+      // demonstração: pico no dia do post com decaimento (~1 semana de vida útil)
       const weight = Math.exp(-age / 3.2);
       const noise = 0.75 + rng(`${it.views}-${d}`)() * 0.5;
       v += it.views * 0.28 * weight * noise;
@@ -108,7 +128,10 @@ export function getMetrics(items, periodDays = 30) {
           .map((m) => ({ ...m, ratio: m.views / med, note: heaterNote(m) }))
       : [];
 
-  return { series, totals, delta, heaters, median: med, sample: last30.length };
+  // Quantos conteúdos reais já têm métricas preenchidas
+  const filled = list.filter((m) => m.real && (m.views + m.saves + m.follows + m.dms) > 0).length;
+
+  return { series, totals, delta, heaters, median: med, sample: last30.length, filled };
 }
 
 /* ── Formata 12400 → "12,4K" ───────────────────────────────────── */
